@@ -4,6 +4,19 @@
 
     A POC demo RESTful API server for student stars.
 
+**The DB has two tables:**
+
+    student: hold static information about students, e.g. id and name.
+    event: a list of academic, social or behaviroal events that add or substruct student points,
+    an event has - studentID <the student id> , type <academic, social or behaviroal> and a value
+    of points to add (negative value will remove points)
+
+**Rulles of the game:**
+
+    When query is sent for specific student, all the events of the last 7 days are added up, and the student
+    recive a score of points for each point type.
+    
+
 **Running:**
 
     npm install
