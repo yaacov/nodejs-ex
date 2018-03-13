@@ -6,4 +6,4 @@ keywords:
 - nodejs
 home: https://access.redhat.com
 sources:
-- https://github.com/openshift/nodejs-ex
+- https://github.com/yaacov/nodejs-ex
