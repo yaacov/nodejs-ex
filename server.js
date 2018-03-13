@@ -166,7 +166,7 @@ app.get("/api/v1/student/:id", function(req, res) {
     console.log(req.params.id);
     db
       .collection("student")
-      .find({ id: req.params.id })
+      .find({ id: str(req.params.id) })
       .toArray(function(err, results) {
         student = results[0];
 
