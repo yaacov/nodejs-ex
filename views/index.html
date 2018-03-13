@@ -13,5 +13,25 @@
 </head>
 <body>
   <img src="images/logo.jpg" alt="Smiley face">
+
+  <h2>Example</h2>
+  <pre>
+    Get list of events:
+    -X GET http://studybuddy-mongo-persistent-studybuddy.1d35.starter-us-east-1.openshiftapps.com/api/v1/event
+
+    Get list of students:
+    -X GET http://studybuddy-mongo-persistent-studybuddy.1d35.starter-us-east-1.openshiftapps.com/api/v1/student
+
+    Get one student with details (studentId == 123):
+    -X GET http://studybuddy-mongo-persistent-studybuddy.1d35.starter-us-east-1.openshiftapps.com/api/v1/student/123
+
+    Post a new stodent:
+    -X PSOT http://studybuddy-mongo-persistent-studybuddy.1d35.starter-us-east-1.openshiftapps.com/api/v1/student
+    -d '{"id": "123",	"name": "moshe"}'
+
+    Post a new event:
+    -X PSOT http://studybuddy-mongo-persistent-studybuddy.1d35.starter-us-east-1.openshiftapps.com/api/v1/event
+    -d '{"studentId": "123", "type": "academic", "value": "1024"}'
+  </pre>
 </body>
 </html>
