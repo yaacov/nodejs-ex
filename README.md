@@ -6,8 +6,8 @@
 
 **The DB has two tables:**
 
-    student: hold static information about students, e.g. id and name.
-    event: a list of academic, social or behaviroal events that add or substruct student points,
+    "student": hold static information about students, e.g. id and name.
+    "event": a list of academic, social or behaviroal events that add or substruct student points,
     an event has - studentID <the student id> , type <academic, social or behaviroal> and a value
     of points to add (negative value will remove points)
 
