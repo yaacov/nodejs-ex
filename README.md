@@ -2,7 +2,7 @@
 
 **What it is:**
 
-    A POC demo RESTful API server for student stars.
+    A POC demo RESTful API server for student points.
 
 **The DB has two tables:**
 
