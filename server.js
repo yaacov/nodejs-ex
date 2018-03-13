@@ -62,7 +62,7 @@ var initDb = function(callback) {
   });
 };
 
-app.use(express.static('public'))
+app.use(express.static("public"));
 
 app.all("/", function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -99,10 +99,10 @@ app.get("/pagecount", function(req, res) {
   }
   if (db) {
     db.collection("counts").count(function(err, count) {
-      res.send("{ pageCount: " + count + "}");
+      res.json({ count: count });
     });
   } else {
-    res.send("{ pageCount: -1 }");
+    res.json({ count: -1 });
   }
 });
 
@@ -122,7 +122,7 @@ app.get("/api/v1/:collection", function(req, res) {
         res.json(results);
       });
   } else {
-    res.send("{ error: db closed }");
+    res.json({ error: "db closed" });
   }
 });
 
@@ -173,11 +173,11 @@ app.get("/api/v1/student/:id", function(req, res) {
         if (student) {
           send_student(db, res, student);
         } else {
-          res.send("{ error: student not found }");
+          res.json({ error: "student not found" });
         }
       });
   } else {
-    res.send("{ error: db closed }");
+    res.json({ error: "db closed" });
   }
 });
 
@@ -194,13 +194,13 @@ app.post("/api/v1/:collection", function(req, res) {
     data.timestamp = Date.now();
     db.collection(req.params.collection).save(data, (err, result) => {
       if (err) {
-        res.send("{ error: " + err + "}");
+        res.json({ error: err });
       } else {
-        res.send("{ result: " + result + "}");
+        res.json(result);
       }
     });
   } else {
-    res.send("{ error: db closed }");
+    res.json({ error: "db closed" });
   }
 });
 
