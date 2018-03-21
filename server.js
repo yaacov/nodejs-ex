@@ -156,6 +156,18 @@ function send_student(db, res, student) {
     });
 }
 
+function get_item(db, collection, id, callback) {
+  db
+    .collection(collection)
+    .find({ id: id })
+    .toArray(function(err, results) {
+      let item = results[0];
+      console.log("results 0", item);
+
+      callback(err, item);
+    });
+}
+
 app.get("/api/v1/student/:id", function(req, res) {
   // try to initialize the db on every request if it's not already
   // initialized.
@@ -164,18 +176,13 @@ app.get("/api/v1/student/:id", function(req, res) {
   }
   if (db) {
     console.log(req.params.id);
-    db
-      .collection("student")
-      .find({ id: req.params.id })
-      .toArray(function(err, results) {
-        student = results[0];
-
-        if (student) {
-          send_student(db, res, student);
-        } else {
-          res.json({ error: "student not found" });
-        }
-      });
+    get_item(db, "student", req.params.id, function(err, student) {
+      if (student) {
+        send_student(db, res, student);
+      } else {
+        res.json({ error: "student not found" });
+      }
+    });
   } else {
     res.json({ error: "db closed" });
   }
@@ -192,11 +199,19 @@ app.post("/api/v1/:collection", function(req, res) {
   if (db) {
     let data = req.body;
     data.timestamp = Date.now();
-    db.collection(req.params.collection).save(data, (err, result) => {
-      if (err) {
-        res.json({ error: err });
+
+    get_item(db, req.params.collection, data.id, function(err, student) {
+      console.log("item", student);
+      if (student) {
+        res.send("{ error: item exist }");
       } else {
-        res.json(result);
+        db.collection(req.params.collection).save(data, (err, result) => {
+          if (err) {
+            res.json({ error: err});
+          } else {
+            res.json({ result: result});
+          }
+        });
       }
     });
   } else {
