@@ -161,10 +161,7 @@ function get_item(db, collection, id, callback) {
     .collection(collection)
     .find({ id: id })
     .toArray(function(err, results) {
-      let item = results[0];
-      console.log("results 0", item);
-
-      callback(err, item);
+      callback(err, results[0]);
     });
 }
 
@@ -200,9 +197,8 @@ app.post("/api/v1/:collection", function(req, res) {
     let data = req.body;
     data.timestamp = Date.now();
 
-    get_item(db, req.params.collection, data.id, function(err, student) {
-      console.log("item", student);
-      if (student) {
+    get_item(db, req.params.collection, data.id, function(err, item) {
+      if (req.params.collection === 'student' && item) {
         res.send("{ error: item exist }");
       } else {
         db.collection(req.params.collection).save(data, (err, result) => {
