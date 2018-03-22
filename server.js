@@ -107,6 +107,8 @@ app.get("/pagecount", function(req, res) {
 });
 
 app.get("/api/v1/:collection", function(req, res) {
+  var collection = req.params.collection;
+
   // try to initialize the db on every request if it's not already
   // initialized.
   if (!db) {
@@ -116,33 +118,36 @@ app.get("/api/v1/:collection", function(req, res) {
     // check for data of last week
     timestamp = Date.now() - 1000 * 60 * 60 * 24 * 7;
     db
-      .collection(req.params.collection)
+      .collection(collection)
       .find({ timestamp: { $gt: timestamp } })
       .toArray(function(err, results) {
         res.json(results);
       });
   } else {
-    res.json({ error: "db closed" });
+    res.status(400).json({ error: "db closed" });
   }
 });
 
-function send_student(db, res, student) {
+function send_item(db, res, collection, item) {
   let data = {
-    student: student,
+    item: item,
+    collection: collection,
     academicPoints: 0,
     socialPoints: 0,
     behavioralPoints: 0
   };
 
-  // check for data of last week
+  // check for this item events of last week
   let timestamp = Date.now() - 1000 * 60 * 60 * 24 * 7;
+  let findBy = {};
+  findBy[collection + "Id"] = item.id;
+  findBy["timestamp"] = { $gt: timestamp };
+
   db
     .collection("event")
-    .find({ studentId: student.id, timestamp: { $gt: timestamp } })
+    .find(findBy)
     .toArray(function(err, results) {
       results.forEach(function(result) {
-        console.log(result);
-        console.log(data);
         if (
           result.value &&
           result.type &&
@@ -157,6 +162,13 @@ function send_student(db, res, student) {
 }
 
 function get_item(db, collection, id, callback) {
+  // check that we got an id
+  if (!id) {
+    callback(null, null);
+    return;
+  }
+
+  // look for item in collection
   db
     .collection(collection)
     .find({ id: id })
@@ -165,23 +177,27 @@ function get_item(db, collection, id, callback) {
     });
 }
 
-app.get("/api/v1/student/:id", function(req, res) {
+app.get("/api/v1/:collection/:id", function(req, res) {
+  var collection = req.params.collection;
+  var id = req.params.id;
+
   // try to initialize the db on every request if it's not already
   // initialized.
   if (!db) {
     initDb(function(err) {});
   }
+
+  // look for item, and send it if found
   if (db) {
-    console.log(req.params.id);
-    get_item(db, "student", req.params.id, function(err, student) {
-      if (student) {
-        send_student(db, res, student);
+    get_item(db, collection, id, function(err, item) {
+      if (item) {
+        send_item(db, res, collection, item);
       } else {
-        res.json({ error: "student not found" });
+        res.status(400).json({ error: "item not found" });
       }
     });
   } else {
-    res.json({ error: "db closed" });
+    res.status(400).json({ error: "db closed" });
   }
 });
 
@@ -198,27 +214,27 @@ app.post("/api/v1/:collection", function(req, res) {
     data.timestamp = Date.now();
 
     get_item(db, req.params.collection, data.id, function(err, item) {
-      if (req.params.collection === 'student' && item) {
-        res.send("{ error: item exist }");
+      if (item && item.id) {
+        res.status(400).json({ error: "item exist" });
       } else {
         db.collection(req.params.collection).save(data, (err, result) => {
           if (err) {
-            res.json({ error: err});
+            res.status(400).json({ error: err });
           } else {
-            res.json({ result: result});
+            res.json({ result: result });
           }
         });
       }
     });
   } else {
-    res.json({ error: "db closed" });
+    res.status(400).json({ error: "db closed" });
   }
 });
 
 // error handling
 app.use(function(err, req, res, next) {
   console.error(err.stack);
-  res.status(500).send("Something bad happened!");
+  res.status(500).status(400).json({ error: err });
 });
 
 initDb(function(err) {
