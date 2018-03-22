@@ -161,6 +161,29 @@ function send_item(db, res, collection, item) {
     });
 }
 
+function send_item_list(db, res, expand, collection, item) {
+  let data = {
+    item: item,
+    collection: collection,
+    list: []
+  };
+
+  // check for this item events of last week
+  let findBy = {};
+  findBy[collection + "Id"] = item.id;
+
+  db
+    .collection(expand)
+    .find(findBy)
+    .toArray(function(err, results) {
+      if (!err && results) {
+        data.list = results;
+      }
+
+      res.json(data);
+    });
+}
+
 function get_item(db, collection, id, callback) {
   // check that we got an id
   if (!id) {
@@ -192,6 +215,31 @@ app.get("/api/v1/:collection/:id", function(req, res) {
     get_item(db, collection, id, function(err, item) {
       if (item) {
         send_item(db, res, collection, item);
+      } else {
+        res.status(400).json({ error: "item not found" });
+      }
+    });
+  } else {
+    res.status(400).json({ error: "db closed" });
+  }
+});
+
+app.get("/api/v1/:expand/:collection/:id", function(req, res) {
+  var expand = req.params.expand;
+  var collection = req.params.collection;
+  var id = req.params.id;
+
+  // try to initialize the db on every request if it's not already
+  // initialized.
+  if (!db) {
+    initDb(function(err) {});
+  }
+
+  // look for item, and send it if found
+  if (db) {
+    get_item(db, collection, id, function(err, item) {
+      if (item) {
+        send_item_list(db, res, expand, collection, item);
       } else {
         res.status(400).json({ error: "item not found" });
       }
