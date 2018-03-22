@@ -279,6 +279,37 @@ app.post("/api/v1/:collection", function(req, res) {
   }
 });
 
+app.put("/api/v1/:collection", function(req, res) {
+  let r;
+
+  // try to initialize the db on every request if it's not already
+  // initialized.
+  if (!db) {
+    initDb(function(err) {});
+  }
+  if (db) {
+    let data = req.body;
+    data.timestamp = Date.now();
+
+    get_item(db, req.params.collection, data.id, function(err, item) {
+      if (!item || !item.id) {
+        res.status(400).json({ error: "item does not exist" });
+      } else {
+        data._id = item._id;
+        db.collection(req.params.collection).save(data, (err, result) => {
+          if (err) {
+            res.status(400).json({ error: err });
+          } else {
+            res.json({ result: result });
+          }
+        });
+      }
+    });
+  } else {
+    res.status(400).json({ error: "db closed" });
+  }
+});
+
 // error handling
 app.use(function(err, req, res, next) {
   console.error(err.stack);
