@@ -44,6 +44,10 @@
     curl -X GET \
     http://studybuddy-mongo-persistent-studybuddy.1d35.starter-us-east-1.openshiftapps.com/api/v1/class/456
 
+    # Get all students in class  (classId == 456):
+    curl -X GET \
+    http://studybuddy-mongo-persistent-studybuddy.1d35.starter-us-east-1.openshiftapps.com/api/v1/student/class/456
+
     # Post a new stodent:
     curl -X POST \
     -H "Content-Type: application/json" \
