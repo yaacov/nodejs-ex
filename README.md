@@ -54,6 +54,13 @@
     http://studybuddy-mongo-persistent-studybuddy.1d35.starter-us-east-1.openshiftapps.com/api/v1/student \
     -d '{"id": "123",	"name": "moshe"}'
 
+    # Put (update) an existing student:
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    http://studybuddy-mongo-persistent-studybuddy.1d35.starter-us-east-1.openshiftapps.com/api/v1/student \
+    -d '{"id": "123",	"name": "moshe", "classId": "456"}'
+
+
     # Post a new class:
     curl -X POST \
     -H "Content-Type: application/json" \
