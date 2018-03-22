@@ -234,7 +234,7 @@ app.post("/api/v1/:collection", function(req, res) {
 // error handling
 app.use(function(err, req, res, next) {
   console.error(err.stack);
-  res.status(500).status(400).json({ error: err });
+  res.status(500).json({ error: err });
 });
 
 initDb(function(err) {
